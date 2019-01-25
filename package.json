@@ -1,0 +1,19 @@
+{
+  "name": "aquaman",
+  "version": "1.0.0",
+  "description": "Redux middlewear for composable, declarative control flow",
+  "main": "index.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "Aquaman"
+  },
+  "keywords": [
+    "react",
+    "redux"
+  ],
+  "author": "Evernote",
+  "license": "MIT"
+}

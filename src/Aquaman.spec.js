@@ -3,7 +3,8 @@ const { FlowStarter } = require('./FlowStarter');
 describe('Aquaman', () => {
   const onEndFlow = jest.fn();
   const onStep = jest.fn();
-  const shouldPreventFlow = jest.fn();
+  const shouldStartFlow = jest.fn();
+  shouldStartFlow.mockReturnValue(true);
   const onWillChooseFlow = jest.fn();
   const functionMap = {};
   const store = {
@@ -15,7 +16,7 @@ describe('Aquaman', () => {
     return {
       onEndFlow,
       onStep,
-      shouldPreventFlow,
+      shouldStartFlow,
       onWillChooseFlow,
       functionMap,
     };
@@ -24,7 +25,8 @@ describe('Aquaman', () => {
   beforeEach(() => {
     onEndFlow.mockReset();
     onStep.mockReset();
-    shouldPreventFlow.mockReset();
+    shouldStartFlow.mockReset();
+    shouldStartFlow.mockReturnValue(true);
     onWillChooseFlow.mockReset();
     store.getState.mockReset();
     dispatch.mockReset();
@@ -58,17 +60,17 @@ describe('Aquaman', () => {
       expect(aquaman.currentFlow).not.toBeNull;
     });
 
-    it('will call shouldPreventFlow', () => {
+    it('will call shouldStartFlow', () => {
       const aquaman = new FlowStarter([], mapReduxToConfig, store, dispatch);
       aquaman.initializeFlow();
 
-      expect(shouldPreventFlow).toHaveBeenCalledTimes(1);
+      expect(shouldStartFlow).toHaveBeenCalledTimes(1);
     });
 
-    it('will not set a current flow if shouldPreventFlow returns true', () => {
+    it('will not set a current flow if shouldStartFlow returns false', () => {
       function mapReduxToConfigLocal() {
         return {
-          shouldPreventFlow: () => true,
+          shouldStartFlow: () => false,
         };
       }
       const aquaman = new FlowStarter(flows, mapReduxToConfigLocal, store, dispatch);
@@ -79,7 +81,7 @@ describe('Aquaman', () => {
 
     it('will not set a current flow if flow is not done', () => {
       const aquaman = new FlowStarter(flows, mapReduxToConfig, store, dispatch);
-      aquaman.done = false;
+      aquaman.inProgress = false;
       aquaman.initializeFlow();
 
       expect(aquaman.currentFlow).toBeNull;
@@ -204,7 +206,7 @@ describe('Aquaman', () => {
       aquaman3.next();
       expect(dispatch).toHaveBeenLastCalledWith({ type: 'step4' });
 
-      expect(aquaman3.done).toBeTruthy;
+      expect(aquaman3.inProgress).toBeFalsy;
     });
   });
 
@@ -224,7 +226,7 @@ describe('Aquaman', () => {
       aquaman.next();
 
       expect(onStep).toHaveBeenCalledTimes(2);
-      expect(aquaman.done).toBeTruthy;
+      expect(aquaman.inProgress).toBeFalsy;
       expect(onEndFlow).toHaveBeenCalledTimes(1);
       expect(onEndFlow).toBeCalledWith('default');
     });
@@ -318,7 +320,7 @@ describe('Aquaman', () => {
 
       expect(dispatch).toHaveBeenCalledWith({ type: 'action1' });
       expect(dispatch).toHaveBeenCalledWith({ type: 'action2' });
-      expect(aquaman.done).toBeTruthy;
+      expect(aquaman.inProgress).toBeFalsy;
     });
 
     it('can handle a normal function with no dispatch', () => {
@@ -423,7 +425,7 @@ describe('Aquaman', () => {
 
       aquaman.close();
 
-      expect(aquaman.done).toBeTruthy;
+      expect(aquaman.inProgress).toBeFalsy;
 
       aquaman.next();
 
@@ -458,11 +460,11 @@ describe('Aquaman', () => {
       aquaman.initializeFlow();
       aquaman.next();
 
-      expect(aquaman.done).toBeTruthy;
+      expect(aquaman.inProgress).toBeFalsy;
 
       aquaman.forceFlow('flow2');
 
-      expect(aquaman.done).toBeFalsy;
+      expect(aquaman.inProgress).toBeTruthy;
       expect(dispatch).toHaveBeenCalledWith({ type: 'step1' });
       expect(dispatch).toHaveBeenCalledTimes(1);
       expect(dispatch).not.toHaveBeenCalledWith({ type: 'step4' });

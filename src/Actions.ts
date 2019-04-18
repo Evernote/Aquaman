@@ -20,11 +20,14 @@ export const aquamanClose = (): {
   type: AquamanStep.CLOSE,
 });
 export const aquamanForceFlow = (
-  key: string
+  key: string,
+  soft?: boolean,
 ): {
   type: AquamanStep.FORCE_FLOW;
   key: string;
+  soft?: boolean;
 } => ({
   type: AquamanStep.FORCE_FLOW,
   key,
+  soft,
 });

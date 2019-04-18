@@ -7,7 +7,7 @@ import { FlowObj, MapReduxToConfig, AquamanConfig } from './Types';
 const defaultReduxConfig = {
   onEndFlow: () => {},
   onStep: () => {},
-  shouldPreventFlow: () => {},
+  shouldStartFlow: () => true,
   onWillChooseFlow: () => {},
   functionMap: {},
 };
@@ -30,26 +30,18 @@ export class FlowStarter {
   dispatch: Dispatch<any>;
   config: AquamanConfig;
   currentFlow: ControlledFlow | null = null;
-  done = true;
+  inProgress = false;
 
   initializeFlow = () => {
-    if (this.config.shouldPreventFlow()) {
+    if (!this.config.shouldStartFlow()) {
       return;
     }
 
-    if (!this.done) {
+    if (this.inProgress) {
       return;
     }
 
-    this.currentFlow = flowController(
-      this.flowPicker(),
-      this.config.functionMap,
-      this.dispatch
-    );
-    if (this.currentFlow) {
-      this.done = false;
-      this.next();
-    }
+    this.setFlow(this.flowPicker());
   };
 
   flowPicker = () => {
@@ -70,8 +62,8 @@ export class FlowStarter {
     return { actionSeries: [], flowId: '', persist: false };
   };
 
-  forceFlow = (flowKey: string) => {
-    if (!this.done) {
+  forceFlow = (flowKey: string, soft?: boolean) => {
+    if (this.inProgress && soft) {
       return;
     }
 
@@ -83,14 +75,20 @@ export class FlowStarter {
 
     const selectedFlow = this.config.onWillChooseFlow(forcedFlow) || forcedFlow;
 
-    this.currentFlow = flowController(
-      selectedFlow,
-      this.config.functionMap,
-      this.dispatch
-    );
-    this.done = false;
-    this.next();
+    this.setFlow(selectedFlow);
   };
+
+  setFlow = (selectedFlow: FlowObj) => {
+      this.currentFlow = flowController(
+        selectedFlow,
+        this.config.functionMap,
+        this.dispatch
+      );
+      if (this.currentFlow) {
+        this.inProgress = true;
+        this.next();
+      }
+  }
 
   next = (data?: any) => {
     const { currentFlow } = this;
@@ -118,7 +116,7 @@ export class FlowStarter {
     if (currentFlow) {
       const flowId = currentFlow.getFlowId();
       this.config.onEndFlow(flowId);
-      this.done = true;
+      this.inProgress = false;
       this.currentFlow = null;
       localStorage.setItem(AQUAMAN_LOCATION_ID, '');
     }

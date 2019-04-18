@@ -24,7 +24,7 @@ export function Aquaman(flows: FlowObj[], mapReduxToConfig: MapReduxToConfig): a
           flow.close();
           break;
         case AquamanStep.FORCE_FLOW:
-          flow.forceFlow(action.key);
+          flow.forceFlow(action.key, action.soft);
           break;
         default:
           break;

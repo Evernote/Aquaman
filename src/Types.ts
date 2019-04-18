@@ -12,7 +12,7 @@ export interface FlowObj {
 export interface AquamanConfig {
   onEndFlow: (flowId: string) => void;
   onStep: () => void;
-  shouldPreventFlow: () => boolean | void;
+  shouldStartFlow: () => boolean | void;
   onWillChooseFlow: (flow: FlowObj) => FlowObj | false | void;
   functionMap: { [functionName: string]: Function };
 }

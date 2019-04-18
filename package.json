@@ -4,7 +4,15 @@
   "description": "Redux middlewear for composable, declarative control flow",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "clean": "rm -rf dist && mkdir dist",
+    "build-module": "webpack webpack.config.js",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build": "npm run clean && npm run build:types && npm run build-module",
+    "test": "jest",
+    "ts": "tsc --noEmit"
+  },
+  "jest": {
+    "preset": "ts-jest/presets/js-with-babel"
   },
   "repository": {
     "type": "git",
@@ -15,5 +23,22 @@
     "redux"
   ],
   "author": "Evernote",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.4.3",
+    "@babel/core": "^7.4.3",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
+    "@babel/preset-env": "^7.4.3",
+    "@babel/preset-typescript": "^7.3.3",
+    "@types/jest": "^24.0.11",
+    "@types/redux": "^3.6.0",
+    "babel-jest": "^24.7.1",
+    "jest": "^24.7.1",
+    "jsdom": "^14.0.0",
+    "ts-jest": "^24.0.2",
+    "ts-loader": "^5.3.3",
+    "typescript": "^3.4.3",
+    "webpack": "^4.30.0",
+    "webpack-cli": "^3.3.0"
+  }
 }

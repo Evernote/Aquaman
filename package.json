@@ -1,14 +1,16 @@
 {
   "name": "aquaman",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Redux middlewear for composable, declarative control flow",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "clean": "rm -rf dist && mkdir dist",
     "build-module": "webpack webpack.config.js",
     "build:types": "tsc --emitDeclarationOnly",
     "build": "npm run clean && npm run build:types && npm run build-module",
     "test": "jest",
+    "prepare": "npm run build",
     "ts": "tsc --noEmit"
   },
   "jest": {
@@ -19,7 +21,6 @@
     "url": "Aquaman"
   },
   "keywords": [
-    "react",
     "redux"
   ],
   "author": "Evernote",

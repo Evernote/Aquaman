@@ -1,3 +1,7 @@
+# Directories
 node_modules
-.vscode
 dist
+.vscode
+# Extensions
+*.log
+*.DS_Store

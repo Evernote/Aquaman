@@ -14,4 +14,6 @@ export {
   AquamanStep,
   MappedFunction
 } from "./Types";
+import { AquamanStep } from "./Types";
+export const END_FLOW = AquamanStep.END_FLOW;
 export { FlowStarter } from './FlowStarter';

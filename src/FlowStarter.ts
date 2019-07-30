@@ -1,4 +1,5 @@
 import { Store, Dispatch } from 'redux';
+import { Observable, combineLatest, of } from 'rxjs';
 
 import flowController, { ControlledFlow, AQUAMAN_LOCATION_ID } from './DispatchController';
 
@@ -12,6 +13,18 @@ const defaultReduxConfig = {
   functionMap: {},
 };
 
+function toObserable(store: Store) {
+  return new Observable(observer => {
+    observer.next(store.getState());
+
+    const unsubscribe = store.subscribe(() => {
+      observer.next(store.getState());
+    });
+
+    return unsubscribe;
+  })
+}
+
 export class FlowStarter {
   constructor(
     flows: FlowObj[],
@@ -23,6 +36,8 @@ export class FlowStarter {
     this.store = store;
     this.dispatch = dispatch;
     this.config = { ...defaultReduxConfig, ...mapReduxToConfig(store, dispatch) };
+
+    this.initializeFlow();
   }
 
   flows: FlowObj[];
@@ -33,33 +48,35 @@ export class FlowStarter {
   inProgress = false;
 
   initializeFlow = () => {
-    if (!this.config.shouldStartFlow()) {
-      return;
-    }
-
-    if (this.inProgress) {
-      return;
-    }
-
-    this.setFlow(this.flowPicker());
-  };
-
-  flowPicker = () => {
-    const state = this.store.getState();
+    const storeObservable = toObserable(this.store);
 
     for (const flow of this.flows) {
-      if (flow.condition && flow.condition(state)) {
-        const overrridingFlow = this.config.onWillChooseFlow(flow);
+      const observables = flow.observables ? flow.observables : [of(undefined)];
 
-        if (overrridingFlow) {
-          return overrridingFlow;
+      combineLatest(storeObservable, ...observables).subscribe(states => {
+        if (this.inProgress) {
+          return;
         }
 
-        return flow;
-      }
-    }
+        if (!this.config.shouldStartFlow()) {
+          return;
+        }
 
-    return { actionSeries: [], flowId: '', persist: false };
+        const canStartFlow = flow.condition && flow.condition(...states);
+
+        if (canStartFlow) {
+          const overrridingFlow = this.config.onWillChooseFlow(flow);
+
+          this.currentFlow = flowController(
+            overrridingFlow || flow,
+            this.config.functionMap,
+            this.dispatch
+          );
+          this.inProgress = true;
+          this.next();
+        }
+      })
+    }
   };
 
   forceFlow = (flowKey: string, soft?: boolean) => {

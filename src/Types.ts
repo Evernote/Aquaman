@@ -1,12 +1,14 @@
 import { Dispatch, AnyAction, Store } from 'redux';
+import { Observable } from 'rxjs';
 import { branchIterator } from './Branch';
 
 export interface FlowObj {
   flowId: string;
   actionSeries: ActionSeries;
-  condition?: (state: any) => boolean;
+  condition?: (...states: any) => boolean;
   persist: boolean;
   key?: string;
+  observables?: Observable<any>;
 }
 
 export interface AquamanConfig {

@@ -8,7 +8,7 @@ export interface FlowObj {
   condition?: (...states: any) => boolean;
   persist: boolean;
   key?: string;
-  observables?: Observable<any>;
+  observables?: Observable<any>[];
 }
 
 export interface AquamanConfig {

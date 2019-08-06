@@ -1,6 +1,7 @@
 const path = require("path");
 
 module.exports = {
+  mode: 'production',
   entry: "./src/index.ts",
   devtool: 'inline-source-map',
   module: {
@@ -13,9 +14,12 @@ module.exports = {
     ]
   },
   resolve: {
-    extensions: ['.ts']
+    extensions: ['.ts', '.js']
   },
   output: {
-    path: path.resolve(__dirname, "dist")
+    filename: 'index.js',
+    path: path.resolve(__dirname, "dist"),
+    library: 'aquaman-redux',
+    libraryTarget: 'commonjs2'
   }
 };

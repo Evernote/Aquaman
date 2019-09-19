@@ -1,4 +1,4 @@
-export { Aquaman } from "./Middleware";
+export { applyAquamanAndMiddleware } from "./Middleware";
 export {
   aquamanNext,
   aquamanPrevious,

@@ -1,12 +1,16 @@
-import { Store, Dispatch } from 'redux';
-import { Observable, combineLatest, of } from 'rxjs';
+import { Store, Dispatch } from "redux";
+import { Observable, combineLatest, EMPTY } from "rxjs";
+import { debounceTime, filter } from "rxjs/operators";
 
-import flowController, { ControlledFlow, AQUAMAN_LOCATION_ID } from './DispatchController';
+import flowController, {
+  ControlledFlow,
+  AQUAMAN_LOCATION_ID,
+} from "./DispatchController";
 
-import { FlowObj, MapReduxToConfig, AquamanConfig } from './Types';
+import { FlowObj, MapReduxToConfig, AquamanConfig } from "./Types";
 
 const defaultReduxConfig = {
-  onEndFlow: () => {},
+  onEndFlow: async () => {},
   onStep: () => {},
   shouldStartFlow: () => true,
   onWillChooseFlow: () => {},
@@ -14,7 +18,7 @@ const defaultReduxConfig = {
 };
 
 function toObserable(store: Store) {
-  return new Observable(observer => {
+  return new Observable<any>((observer) => {
     observer.next(store.getState());
 
     const unsubscribe = store.subscribe(() => {
@@ -22,7 +26,7 @@ function toObserable(store: Store) {
     });
 
     return unsubscribe;
-  })
+  });
 }
 
 export class FlowStarter {
@@ -35,7 +39,10 @@ export class FlowStarter {
     this.flows = flows;
     this.store = store;
     this.dispatch = dispatch;
-    this.config = { ...defaultReduxConfig, ...mapReduxToConfig(store, dispatch) };
+    this.config = {
+      ...defaultReduxConfig,
+      ...mapReduxToConfig(store, dispatch),
+    };
 
     this.initializeFlow();
   }
@@ -51,31 +58,26 @@ export class FlowStarter {
     const storeObservable = toObserable(this.store);
 
     for (const flow of this.flows) {
-      const observables = flow.observables ? flow.observables : [of(undefined)];
+      const observables = flow.observables ? flow.observables : [EMPTY];
 
-      combineLatest(storeObservable, ...observables).subscribe(states => {
-        if (this.inProgress) {
-          return;
-        }
+      combineLatest([storeObservable, ...observables])
+        .pipe(filter(() => !this.inProgress && !!this.config.shouldStartFlow()))
+        .subscribe((states) => {
+          const canStartFlow = flow.condition && flow.condition(...states);
 
-        if (!this.config.shouldStartFlow()) {
-          return;
-        }
+          if (canStartFlow) {
+            const overrridingFlow = this.config.onWillChooseFlow(flow);
 
-        const canStartFlow = flow.condition && flow.condition(...states);
-
-        if (canStartFlow) {
-          const overrridingFlow = this.config.onWillChooseFlow(flow);
-
-          this.currentFlow = flowController(
-            overrridingFlow || flow,
-            this.config.functionMap,
-            this.dispatch
-          );
-          this.inProgress = true;
-          this.next();
-        }
-      })
+            this.currentFlow = flowController(
+              overrridingFlow || flow,
+              this.config.functionMap,
+              this.dispatch,
+              this.config.persistSettings
+            );
+            this.inProgress = true;
+            this.next();
+          }
+        });
     }
   };
 
@@ -84,7 +86,7 @@ export class FlowStarter {
       return;
     }
 
-    const forcedFlow = this.flows.find(flow => flow.key === flowKey);
+    const forcedFlow = this.flows.find((flow) => flow.key === flowKey);
 
     if (!forcedFlow) {
       return;
@@ -96,16 +98,16 @@ export class FlowStarter {
   };
 
   setFlow = (selectedFlow: FlowObj) => {
-      this.currentFlow = flowController(
-        selectedFlow,
-        this.config.functionMap,
-        this.dispatch
-      );
-      if (this.currentFlow) {
-        this.inProgress = true;
-        this.next();
-      }
-  }
+    this.currentFlow = flowController(
+      selectedFlow,
+      this.config.functionMap,
+      this.dispatch
+    );
+    if (this.currentFlow) {
+      this.inProgress = true;
+      this.next();
+    }
+  };
 
   next = (data?: any) => {
     const { currentFlow } = this;
@@ -128,14 +130,14 @@ export class FlowStarter {
     }
   };
 
-  close = () => {
+  close = async () => {
     const { currentFlow } = this;
     if (currentFlow) {
       const flowId = currentFlow.getFlowId();
-      this.config.onEndFlow(flowId);
+      await this.config.onEndFlow(flowId);
       this.inProgress = false;
       this.currentFlow = null;
-      localStorage.setItem(AQUAMAN_LOCATION_ID, '');
+      this.config.persistSettings?.saveLocation(AQUAMAN_LOCATION_ID, "");
     }
   };
 }

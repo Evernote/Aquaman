@@ -1,6 +1,6 @@
-import { Dispatch, AnyAction, Store } from 'redux';
-import { Observable } from 'rxjs';
-import { branchIterator } from './Branch';
+import { Dispatch, AnyAction, Store } from "redux";
+import { Observable } from "rxjs";
+import { branchIterator } from "./Branch";
 
 export interface FlowObj {
   flowId: string;
@@ -11,8 +11,14 @@ export interface FlowObj {
   observables?: Observable<any>[];
 }
 
+export interface PersistSettings {
+  saveLocation(key: string, value: string): void;
+  recoverLocation(key: string): Promise<void>;
+}
+
 export interface AquamanConfig {
-  onEndFlow: (flowId: string) => void;
+  persistSettings?: PersistSettings;
+  onEndFlow: (flowId: string) => Promise<void>;
   onStep: () => void;
   shouldStartFlow: () => boolean | void;
   onWillChooseFlow: (flow: FlowObj) => FlowObj | false | void;
@@ -22,8 +28,16 @@ export interface AquamanConfig {
 export type AquamanConfigPartial = Partial<AquamanConfig>;
 
 export type ActionOrCreator = AnyAction | ((...any: any[]) => AnyAction);
-export type MultiActionStep = (ActionOrCreator | (() => any) | AquamanStep.END_FLOW)[];
-export type AquamanAction = ActionOrCreator | Branch | MultiActionStep | MappedFunction;
+export type MultiActionStep = (
+  | ActionOrCreator
+  | (() => any)
+  | AquamanStep.FORCE_END_MULTISTEP
+)[];
+export type AquamanAction =
+  | ActionOrCreator
+  | Branch
+  | MultiActionStep
+  | MappedFunction;
 export type ActionSeries = AquamanAction[];
 
 export interface Branch {
@@ -38,11 +52,11 @@ export type MapReduxToConfig = (
 ) => AquamanConfigPartial;
 
 export enum AquamanStep {
-  NEXT = '__Aquaman_NEXT__',
-  PREVIOUS = '__Aquaman_PREVIOUS__',
-  CLOSE = '__Aquaman_CLOSE__',
-  FORCE_FLOW = '__Aquaman_FORCE_FLOW__',
-  END_FLOW = '__Aquaman_END_FLOW__'
+  NEXT = "__Aquaman_NEXT__",
+  PREVIOUS = "__Aquaman_PREVIOUS__",
+  CLOSE = "__Aquaman_CLOSE__",
+  FORCE_FLOW = "__Aquaman_FORCE_FLOW__",
+  FORCE_END_MULTISTEP = "__Aquaman_FORCE_END_MULTISTEP__",
 }
 
 export interface MappedFunction {

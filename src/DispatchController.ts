@@ -1,6 +1,6 @@
-import { Dispatch } from 'redux';
+import { Dispatch } from "redux";
 
-import FlowGraph from './Graph';
+import FlowGraph from "./Graph";
 import {
   FlowObj,
   AquamanAction,
@@ -8,7 +8,8 @@ import {
   MultiActionStep,
   AquamanStep,
   MappedFunction,
-} from './Types';
+  PersistSettings,
+} from "./Types";
 
 export interface ControlledFlow {
   next: (data: any) => boolean;
@@ -16,12 +17,13 @@ export interface ControlledFlow {
   getFlowId: () => string;
 }
 
-export const AQUAMAN_LOCATION_ID = 'AQUAMAN_LOCATION_ID';
+export const AQUAMAN_LOCATION_ID = "AQUAMAN_LOCATION_ID";
 
 export default function flowController(
   { actionSeries, flowId, persist }: FlowObj,
   functionMap: { [functionKey: string]: Function },
-  dispatch: Dispatch<any>
+  dispatch: Dispatch<any>,
+  persistSettings?: PersistSettings
 ): ControlledFlow | null {
   if (!actionSeries || !actionSeries.length) {
     return null;
@@ -60,7 +62,7 @@ export default function flowController(
       if (returnedYield) {
         return returnedYield;
       }
-    } else if (typeof action === 'function') {
+    } else if (typeof action === "function") {
       const returnedYield = action(data);
 
       if (returnedYield.type) {
@@ -79,11 +81,14 @@ export default function flowController(
   }
 
   function saveLocation(): void {
-    localStorage.setItem(AQUAMAN_LOCATION_ID, flowGraph.getCurrentNodeId());
+    persistSettings?.saveLocation(
+      AQUAMAN_LOCATION_ID,
+      flowGraph.getCurrentNodeId()
+    );
   }
 
-  function recoverLocation(): void {
-    const nodeId = localStorage.getItem(AQUAMAN_LOCATION_ID);
+  async function recoverLocation(): Promise<void> {
+    const nodeId = await persistSettings?.recoverLocation(AQUAMAN_LOCATION_ID);
 
     if (nodeId) {
       flowGraph.setPosition(nodeId);
@@ -91,14 +96,15 @@ export default function flowController(
   }
 
   function dispatchStep(currentStep: ActionOrCreator | MappedFunction): void {
-    if (typeof currentStep === 'function') {
+    if (typeof currentStep === "function") {
       const action = currentStep();
 
       if (action && action.type) {
         dispatch(action);
       }
     } else if ((currentStep as MappedFunction).__Aquaman_FUNCTION__) {
-      const func: Function = functionMap[(currentStep as MappedFunction).functionName];
+      const func: Function =
+        functionMap[(currentStep as MappedFunction).functionName];
 
       if (func) {
         func(...(currentStep as MappedFunction).args);
@@ -110,7 +116,7 @@ export default function flowController(
 
   function dispatchAll(stepArr: MultiActionStep): boolean | void {
     for (const subStep of stepArr) {
-      if (subStep === AquamanStep.END_FLOW) {
+      if (subStep === AquamanStep.FORCE_END_MULTISTEP) {
         return true;
       }
 

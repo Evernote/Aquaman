@@ -3,7 +3,7 @@ export {
   aquamanNext,
   aquamanPrevious,
   aquamanClose,
-  aquamanForceFlow
+  aquamanForceFlow,
 } from "./Actions";
 export { branch } from "./Branch";
 export {
@@ -12,8 +12,8 @@ export {
   Branch,
   MapReduxToConfig,
   AquamanStep,
-  MappedFunction
+  MappedFunction,
 } from "./Types";
 import { AquamanStep } from "./Types";
-export const END_FLOW = AquamanStep.END_FLOW;
-export { FlowStarter } from './FlowStarter';
+export const FORCE_END_MULTISTEP = AquamanStep.FORCE_END_MULTISTEP;
+export { FlowStarter } from "./FlowStarter";

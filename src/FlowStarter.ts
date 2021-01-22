@@ -1,6 +1,6 @@
 import { Store, Dispatch } from "redux";
 import { Observable, combineLatest, EMPTY } from "rxjs";
-import { debounceTime, filter } from "rxjs/operators";
+import { filter } from "rxjs/operators";
 
 import flowController, {
   ControlledFlow,
@@ -59,6 +59,17 @@ export class FlowStarter {
 
     for (const flow of this.flows) {
       const observables = flow.observables ? flow.observables : [EMPTY];
+
+      // fix mysteriously failing interop
+      for (const observable of observables) {
+        // @ts-ignore
+        if (observable["@@observable"] != null) {
+          // @ts-ignore
+          observable[Symbol.observable] = function () {
+            return this;
+          };
+        }
+      }
 
       combineLatest([storeObservable, ...observables])
         .pipe(filter(() => !this.inProgress && !!this.config.shouldStartFlow()))

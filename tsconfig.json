@@ -1,25 +1,19 @@
 {
-    "compilerOptions": {
-      "outDir": "./dist/",
-      "strict": true,
-      "declaration": true,
-      "sourceMap": true,
-      "moduleResolution": "node",
-      "module": "esnext",
-      "target": "es5",
-      "alwaysStrict": true,
-      "downlevelIteration": true,
-      "lib": ["esnext", "dom", "esnext.asynciterable"],
-      "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true,
-      "baseUrl": "."
-    },
-    "include": [
-      "**/*.d.ts",
-      "**/*.ts"
-    ],
-    "exclude": [
-      "node_modules",
-      "**/*.spec.ts"
-    ]
-  }
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "strict": true,
+    "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "module": "esnext",
+    "target": "es5",
+    "alwaysStrict": true,
+    "downlevelIteration": true,
+    "lib": ["esnext", "dom", "esnext.asynciterable"],
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "."
+  },
+  "include": ["**/*.d.ts", "**/*.ts"],
+  "exclude": ["node_modules", "**/*.spec.ts"]
+}

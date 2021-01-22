@@ -1,5 +1,10 @@
 import { Store, Dispatch } from "redux";
-import { Observable, combineLatest, EMPTY } from "rxjs";
+import {
+  Observable,
+  combineLatest,
+  EMPTY,
+  observable as Symbol_observable,
+} from "rxjs";
 import { filter } from "rxjs/operators";
 
 import flowController, {
@@ -62,12 +67,14 @@ export class FlowStarter {
 
       // fix mysteriously failing interop
       for (const observable of observables) {
-        // @ts-ignore
-        if (observable["@@observable"] != null) {
+        if (
           // @ts-ignore
-          observable[Symbol.observable] = function () {
-            return this;
-          };
+          observable["@@observable"] != null &&
+          // @ts-ignore
+          observable[Symbol_observable] == null
+        ) {
+          // @ts-ignore
+          observable[Symbol_observable] = observable["@@observable"];
         }
       }
 

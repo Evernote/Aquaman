@@ -1,25 +1,29 @@
 const path = require("path");
 
 module.exports = {
-  mode: 'production',
+  mode: "production",
   entry: "./src/index.ts",
-  devtool: 'inline-source-map',
+  devtool: "inline-source-map",
   module: {
     rules: [
       {
         test: /\.ts?$/,
         use: "ts-loader",
-        exclude: /node_modules/
-      }
-    ]
+        exclude: /node_modules/,
+      },
+    ],
   },
   resolve: {
-    extensions: ['.ts', '.js']
+    extensions: [".ts", ".js"],
   },
   output: {
-    filename: 'index.js',
+    filename: "index.js",
     path: path.resolve(__dirname, "dist"),
-    library: 'aquaman-redux',
-    libraryTarget: 'commonjs2'
-  }
+    library: "aquaman-redux",
+    libraryTarget: "commonjs2",
+  },
+  externals: {
+    rxjs: "rxjs",
+    redux: "redux",
+  },
 };

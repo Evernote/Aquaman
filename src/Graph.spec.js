@@ -1,37 +1,40 @@
+const FlowGraph = require("./Graph").default;
+const Node = require("./Graph").Node;
+const branch = require("./Branch").branch;
 
-const FlowGraph = require('./Graph').default;
-const Node = require('./Graph').Node;
-const branch = require('./Branch').branch;
-
-describe('FlowGraph', () => {
+describe("FlowGraph", () => {
   const actionSeries = [
-    'action1',
-    'action2',
-    'action3',
-    branch(['action4'], ['action5'], ['action6', branch(['action7'], ['action8'])]),
-    'action9',
+    "action1",
+    "action2",
+    "action3",
+    branch(
+      ["action4"],
+      ["action5"],
+      ["action6", branch(["action7"], ["action8"])]
+    ),
+    "action9",
   ];
 
-  describe('#makeSubGraph', () => {
-    it('handles an empty actionSeries', () => {
-      expect(FlowGraph.makeSubGraph([])).toBeNull;
+  describe("#makeSubGraph", () => {
+    it("handles an empty actionSeries", () => {
+      expect(FlowGraph.makeSubGraph([])).toBeNull();
     });
 
-    it('correctly generates the graph', () => {
+    it("correctly generates the graph", () => {
       Node.resetCounterGen();
 
-      const node904 = new Node('action9', [], '6');
-      const node903 = new Node('action9', [], '4');
-      const node902 = new Node('action9', [], '2');
-      const node901 = new Node('action9', [], '0');
-      const node8 = new Node('action8', [node904], '7');
-      const node7 = new Node('action7', [node903], '5');
-      const node6 = new Node('action6', [node7, node8], '8');
-      const node5 = new Node('action5', [node902], '3');
-      const node4 = new Node('action4', [node901], '1');
-      const node3 = new Node('action3', [node4, node5, node6], '9');
-      const node2 = new Node('action2', [node3], '10');
-      const node1 = new Node('action1', [node2], '11');
+      const node904 = new Node("action9", [], "6");
+      const node903 = new Node("action9", [], "4");
+      const node902 = new Node("action9", [], "2");
+      const node901 = new Node("action9", [], "0");
+      const node8 = new Node("action8", [node904], "7");
+      const node7 = new Node("action7", [node903], "5");
+      const node6 = new Node("action6", [node7, node8], "8");
+      const node5 = new Node("action5", [node902], "3");
+      const node4 = new Node("action4", [node901], "1");
+      const node3 = new Node("action3", [node4, node5, node6], "9");
+      const node2 = new Node("action2", [node3], "10");
+      const node1 = new Node("action1", [node2], "11");
 
       node901.setParent(node4);
       node902.setParent(node5);
@@ -49,52 +52,52 @@ describe('FlowGraph', () => {
     });
   });
 
-  describe('#next', () => {
-    it('can step through a graph, returning the correct values', () => {
+  describe("#next", () => {
+    it("can step through a graph, returning the correct values", () => {
       const graph = new FlowGraph(actionSeries);
 
-      expect(graph.next()).toBe('action1');
-      expect(graph.next()).toBe('action2');
-      expect(graph.next()).toBe('action3');
-      expect(graph.next(2)).toBe('action6');
-      expect(graph.next(1)).toBe('action8');
-      expect(graph.next()).toBe('action9');
-      expect(graph.next()).toBeNull;
+      expect(graph.next()).toBe("action1");
+      expect(graph.next()).toBe("action2");
+      expect(graph.next()).toBe("action3");
+      expect(graph.next(2)).toBe("action6");
+      expect(graph.next(1)).toBe("action8");
+      expect(graph.next()).toBe("action9");
+      expect(graph.next()).toBeNull();
     });
   });
 
-  describe('#previous', () => {
-    it('can navigate back and forth through the graph', () => {
+  describe("#previous", () => {
+    it("can navigate back and forth through the graph", () => {
       const graph = new FlowGraph(actionSeries);
 
-      expect(graph.next()).toBe('action1');
-      expect(graph.next()).toBe('action2');
-      expect(graph.previous()).toBe('action1');
-      expect(graph.next()).toBe('action2');
-      expect(graph.next()).toBe('action3');
-      expect(graph.next(2)).toBe('action6');
-      expect(graph.previous()).toBe('action3');
-      expect(graph.next(1)).toBe('action5');
-      expect(graph.next()).toBe('action9');
-      expect(graph.previous()).toBe('action5');
-      expect(graph.previous()).toBe('action3');
-      expect(graph.previous()).toBe('action2');
-      expect(graph.previous()).toBe('action1');
-      expect(graph.previous()).toBe('action1');
+      expect(graph.next()).toBe("action1");
+      expect(graph.next()).toBe("action2");
+      expect(graph.previous()).toBe("action1");
+      expect(graph.next()).toBe("action2");
+      expect(graph.next()).toBe("action3");
+      expect(graph.next(2)).toBe("action6");
+      expect(graph.previous()).toBe("action3");
+      expect(graph.next(1)).toBe("action5");
+      expect(graph.next()).toBe("action9");
+      expect(graph.previous()).toBe("action5");
+      expect(graph.previous()).toBe("action3");
+      expect(graph.previous()).toBe("action2");
+      expect(graph.previous()).toBe("action1");
+      expect(graph.previous()).toBe("action1");
     });
   });
 
-  describe('Symbol.iterator', () => {
-    it('can traverse the graph and find every node', () => {
+  describe("Symbol.iterator", () => {
+    it("can traverse the graph and find every node", () => {
       const graph = new FlowGraph(actionSeries);
 
       expect([...graph].length).toBe(12);
     });
 
-    it('gets all the unique ids', () => {
+    it("gets all the unique ids", () => {
       const graph = new FlowGraph(actionSeries);
 
-      expect(new Set([...graph].map(node => node.nodeId)).size).toBe(12);
+      expect(new Set([...graph].map((node) => node.nodeId)).size).toBe(12);
     });
 
     it("won't error out with an empty actionSeries", () => {
@@ -104,14 +107,14 @@ describe('FlowGraph', () => {
     });
   });
 
-  describe('#setPosition', () => {
-    it('can recover a posistion in the graph', () => {
+  describe("#setPosition", () => {
+    it("can recover a posistion in the graph", () => {
       const graph = new FlowGraph(actionSeries);
 
-      graph.setPosition('3');
+      graph.setPosition("3");
 
-      expect(graph.next()).toBe('action5');
-      expect(graph.next()).toBe('action9');
+      expect(graph.next()).toBe("action5");
+      expect(graph.next()).toBe("action9");
     });
   });
 });

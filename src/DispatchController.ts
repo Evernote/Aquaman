@@ -102,6 +102,7 @@ export default function flowController(
       if (action && action.type) {
         dispatch(action);
       }
+      // eslint-disable-next-line no-underscore-dangle
     } else if ((currentStep as MappedFunction).__Aquaman_FUNCTION__) {
       const func: Function =
         functionMap[(currentStep as MappedFunction).functionName];

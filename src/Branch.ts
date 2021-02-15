@@ -1,4 +1,4 @@
-import { Branch, ActionSeries } from './Types';
+import { Branch, ActionSeries } from "./Types";
 
 /*
  * Use branch to generate conditional flows based off user actions.
@@ -11,10 +11,13 @@ import { Branch, ActionSeries } from './Types';
  */
 
 export function branch(...args: ActionSeries[]): Branch {
-  const branches = args.reduce((acc: { [key: number]: any }, curr: any, idx: number) => {
-    acc[idx] = curr;
-    return acc;
-  }, {});
+  const branches = args.reduce(
+    (acc: { [key: number]: any }, curr: any, idx: number) => {
+      acc[idx] = curr;
+      return acc;
+    },
+    {}
+  );
 
   return {
     __BRANCH__: true,
@@ -26,6 +29,6 @@ export function* branchIterator(this: Branch): IterableIterator<ActionSeries> {
   let i = 0;
   while ((this as Branch)[i]) {
     yield (this as Branch)[i] as ActionSeries;
-    i++;
+    i += 1;
   }
 }

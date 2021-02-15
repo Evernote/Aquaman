@@ -1,5 +1,5 @@
-import { branchIterator } from './Branch';
-import { AquamanAction, ActionSeries, Branch } from './Types';
+import { branchIterator } from "./Branch";
+import { AquamanAction, ActionSeries, Branch } from "./Types";
 
 export class Node {
   value: AquamanAction;
@@ -20,7 +20,7 @@ export class Node {
   static *counter(): IterableIterator<number> {
     let count = 0;
     while (true) {
-      yield count++;
+      yield (count += 1);
     }
   }
 
@@ -60,7 +60,7 @@ export default class Graph implements Iterable<Node> {
 
     const { children } = this.currentNode;
     this.currentNode =
-      indexOrData && typeof indexOrData === 'number'
+      indexOrData && typeof indexOrData === "number"
         ? children[indexOrData]
         : children[0];
 
@@ -76,7 +76,7 @@ export default class Graph implements Iterable<Node> {
     if (node) {
       return node.nodeId;
     }
-    return '';
+    return "";
   }
 
   previous(): AquamanAction | null {
@@ -121,29 +121,37 @@ export default class Graph implements Iterable<Node> {
 
   [Symbol.iterator] = this.traverse;
 
-  static makeSubGraph([step, ...remainingSteps]: ActionSeries): Node | Node[] | null {
+  static makeSubGraph([step, ...remainingSteps]: ActionSeries):
+    | Node
+    | Node[]
+    | null {
     if (!step) {
       return null;
     }
 
+    // eslint-disable-next-line no-underscore-dangle
     if ((step as Branch).__BRANCH__) {
       (step as Branch)[Symbol.iterator] = branchIterator;
 
-      // A Branch object has action series on it's numbered properties. Here, we iterate through
-      // each of those arrays, append the remaining steps, and recursively make subgraphs for those
-      // complete action series.
+      /** A Branch object has action series on it's numbered properties. Here,
+       * we iterate through each of those arrays, append the remaining steps,
+       * and recursively make subgraphs for those complete action series.
+       */
 
-      // @ts-ignore error indicating Branch does not have Symbol.iterator, even though we
+      // error indicating Branch does not have Symbol.iterator, even though we
       // add it on line above.
+      // @ts-ignore
       return [...(step as Branch)]
-        .map(substep => substep.concat(remainingSteps))
-        .map((currentSeries: ActionSeries) => this.makeSubGraph(currentSeries)) as Node[];
+        .map((substep) => substep.concat(remainingSteps))
+        .map((currentSeries: ActionSeries) =>
+          this.makeSubGraph(currentSeries)
+        ) as Node[];
     }
 
     const children = this.makeChildren(remainingSteps);
 
     const node = new Node(step, children as Node[]);
-    (children as Node[]).forEach(child => {
+    (children as Node[]).forEach((child) => {
       child.setParent(node);
     });
 
@@ -158,6 +166,6 @@ export default class Graph implements Iterable<Node> {
       }
 
       return [subSeries] as Node[];
-    })().filter(val => val != null);
+    })().filter((val) => val != null);
   }
 }

@@ -1,4 +1,4 @@
-import { AquamanStep } from './Types';
+import { AquamanStep } from "./Types";
 
 export const aquamanNext = (
   data?: any
@@ -21,7 +21,7 @@ export const aquamanClose = (): {
 });
 export const aquamanForceFlow = (
   key: string,
-  soft?: boolean,
+  soft?: boolean
 ): {
   type: AquamanStep.FORCE_FLOW;
   key: string;

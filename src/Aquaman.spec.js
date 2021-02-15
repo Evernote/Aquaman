@@ -59,7 +59,7 @@ describe("Aquaman", () => {
     it("will set a current flow with valid flows", () => {
       const aquaman = new FlowStarter(flows, mapReduxToConfig, store, dispatch);
 
-      expect(aquaman.currentFlow).not.toBeNull;
+      expect(aquaman.currentFlow).not.toBeNull();
     });
 
     it.skip("will call shouldStartFlow", () => {
@@ -81,14 +81,14 @@ describe("Aquaman", () => {
         dispatch
       );
 
-      expect(aquaman.currentFlow).toBeNull;
+      expect(aquaman.currentFlow).toBeNull();
     });
 
     it("will not set a current flow if flow is not done", () => {
       const aquaman = new FlowStarter(flows, mapReduxToConfig, store, dispatch);
       aquaman.inProgress = false;
 
-      expect(aquaman.currentFlow).toBeNull;
+      expect(aquaman.currentFlow).toBeNull();
     });
 
     it("will call #onStep and #next and dispatch the first step", () => {
@@ -209,12 +209,12 @@ describe("Aquaman", () => {
         dispatch
       );
 
-      expect(flow1NotDone).toBeTruthy;
+      expect(flow1NotDone).toBeTruthy();
       expect(dispatch).toHaveBeenCalledWith({ type: "step2" });
 
       aquaman2.next();
 
-      expect(flow1NotDone).toBeFalsy;
+      expect(flow1NotDone).toBeFalsy();
       expect(dispatch).toHaveBeenCalledWith({ type: "step3" });
 
       aquaman2.next();
@@ -231,7 +231,7 @@ describe("Aquaman", () => {
       aquaman3.next();
       expect(dispatch).toHaveBeenLastCalledWith({ type: "step4" });
 
-      expect(aquaman3.inProgress).toBeFalsy;
+      expect(aquaman3.inProgress).toBeFalsy();
     });
   });
 
@@ -250,7 +250,7 @@ describe("Aquaman", () => {
       aquaman.next();
 
       expect(onStep).toHaveBeenCalledTimes(2);
-      expect(aquaman.inProgress).toBeFalsy;
+      expect(aquaman.inProgress).toBeFalsy();
       expect(onEndFlow).toHaveBeenCalledTimes(1);
       expect(onEndFlow).toBeCalledWith("default");
     });
@@ -348,7 +348,7 @@ describe("Aquaman", () => {
 
       expect(dispatch).toHaveBeenCalledWith({ type: "action1" });
       expect(dispatch).toHaveBeenCalledWith({ type: "action2" });
-      expect(aquaman.inProgress).toBeFalsy;
+      expect(aquaman.inProgress).toBeFalsy();
     });
 
     it("can handle a normal function with no dispatch", () => {
@@ -465,7 +465,7 @@ describe("Aquaman", () => {
 
       aquaman.close();
 
-      expect(aquaman.inProgress).toBeFalsy;
+      expect(aquaman.inProgress).toBeFalsy();
 
       aquaman.next();
 
@@ -503,11 +503,11 @@ describe("Aquaman", () => {
       const aquaman = new FlowStarter(flows, mapReduxToConfig, store, dispatch);
       aquaman.next();
 
-      expect(aquaman.inProgress).toBeFalsy;
+      expect(aquaman.inProgress).toBeFalsy();
 
       aquaman.forceFlow("flow2");
 
-      expect(aquaman.inProgress).toBeTruthy;
+      expect(aquaman.inProgress).toBeTruthy();
       expect(dispatch).toHaveBeenCalledWith({ type: "step1" });
       expect(dispatch).toHaveBeenCalledTimes(1);
       expect(dispatch).not.toHaveBeenCalledWith({ type: "step4" });

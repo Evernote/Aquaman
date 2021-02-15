@@ -12,7 +12,8 @@
     "lib": ["esnext", "dom", "esnext.asynciterable"],
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": ["node"]
   },
   "include": ["**/*.d.ts", "**/*.ts"],
   "exclude": ["node_modules", "**/*.spec.ts"]

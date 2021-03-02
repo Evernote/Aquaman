@@ -1,6 +1,6 @@
 {
   "name": "aquaman-redux",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Redux middlewear for composable, declarative control flow",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -26,31 +26,31 @@
   "author": "Evernote",
   "license": "MIT",
   "devDependencies": {
-    "@babel/cli": "^7.12.8",
-    "@babel/core": "^7.12.9",
-    "@babel/plugin-proposal-async-generator-functions": "^7.12.1",
-    "@babel/plugin-proposal-class-properties": "^7.12.1",
-    "@babel/plugin-proposal-object-rest-spread": "^7.12.1",
-    "@babel/preset-env": "^7.12.7",
-    "@babel/preset-typescript": "^7.12.7",
-    "@types/jest": "^26.0.15",
+    "@babel/cli": "^7.13.0",
+    "@babel/core": "^7.13.8",
+    "@babel/plugin-proposal-async-generator-functions": "^7.13.8",
+    "@babel/plugin-proposal-class-properties": "^7.13.0",
+    "@babel/plugin-proposal-object-rest-spread": "^7.13.8",
+    "@babel/preset-env": "^7.13.9",
+    "@babel/preset-typescript": "^7.13.0",
+    "@types/jest": "^26.0.20",
     "babel-jest": "^26.6.3",
-    "babel-loader": "^8.2.1",
+    "babel-loader": "^8.2.2",
+    "emojis-list": "^3.0.0",
     "jest": "^26.6.3",
     "jsdom": "^16.4.0",
-    "ts-jest": "^26.4.4",
-    "ts-loader": "^8.0.11",
-    "typescript": "^4.1.2",
-    "webpack": "^4.40.2",
-    "webpack-bundle-analyzer": "^4.4.0",
-    "webpack-cli": "^3.3.9"
-  },
-  "dependencies": {
     "redux": "^4.0.5",
-    "rxjs": "^6.6.3"
+    "rxjs": "^6.6.6",
+    "ts-jest": "^26.5.2",
+    "ts-loader": "^8.0.17",
+    "tslib": "^2.1.0",
+    "typescript": "^4.2.2",
+    "webpack": "^5.24.2",
+    "webpack-bundle-analyzer": "^4.4.0",
+    "webpack-cli": "^4.5.0"
   },
   "peerDependencies": {
-    "redux": ">4",
-    "rxjs": ">6"
+    "redux": ">=4.0.0",
+    "rxjs": ">=6.0.0"
   }
 }

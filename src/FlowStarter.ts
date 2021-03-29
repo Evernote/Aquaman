@@ -21,7 +21,7 @@ const defaultReduxConfig = {
   shouldStartFlow: () => true,
   onWillChooseFlow: () => {},
   functionMap: {},
-  coexclusiveFlows: [],
+  mutuallyExclusiveFlows: [],
 };
 
 function toObserable(store: Store) {
@@ -51,7 +51,7 @@ export class FlowStarter {
       ...mapReduxToConfig(store, dispatch),
     };
 
-    this.excluder = FlowExcluder(this.config.coexclusiveFlows ?? []);
+    this.excluder = FlowExcluder(this.config.mutuallyExclusiveFlows ?? []);
 
     this.initializeFlow();
   }

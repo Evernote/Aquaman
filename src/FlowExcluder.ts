@@ -3,26 +3,30 @@ export interface Excluder {
   isExcluded(flowId: string): boolean;
 }
 
-export function FlowExcluder(coexclusiveFlows: string[][]) {
+export function FlowExcluder(mutuallyExclusiveFlows: string[][]) {
   const viewed = new Set<string>();
-  const exclusions = setCoexclusives();
+  const exclusions = setMutuallyExclusives();
 
   function setViewed(flowId: string) {
+    if (!exclusions.has(flowId)) {
+      exclusions.set(flowId, new Set([flowId]));
+    }
+
     viewed.add(flowId);
   }
 
-  function setCoexclusives() {
+  function setMutuallyExclusives() {
     const map = new Map<string, Set<string>>();
 
-    for (const coexclusives of coexclusiveFlows) {
-      for (const flowId of coexclusives) {
+    for (const mutuallyExclusives of mutuallyExclusiveFlows) {
+      for (const flowId of mutuallyExclusives) {
         if (map.has(flowId)) {
           const set = map.get(flowId)!;
-          for (const val of coexclusives) {
+          for (const val of mutuallyExclusives) {
             set.add(val);
           }
         } else {
-          map.set(flowId, new Set(coexclusives));
+          map.set(flowId, new Set(mutuallyExclusives));
         }
       }
     }

@@ -6,7 +6,7 @@ import {
   compose,
   Reducer,
   StoreCreator,
-  Middleware
+  Middleware,
 } from "redux";
 import { FlowStarter } from "./FlowStarter";
 import { FlowObj, MapReduxToConfig, AquamanStep } from "./Types";
@@ -48,7 +48,10 @@ function AquamanMiddleware(
   };
 }
 
-function applyAquaman(aquamanMiddleware: Function, ...middlewares: Middleware[]) {
+function applyAquaman(
+  aquamanMiddleware: Function,
+  ...middlewares: Middleware[]
+) {
   return (createStore: StoreCreator) => <S, A extends AnyAction>(
     reducer: Reducer<S, A>,
     ...args: any[]
@@ -63,7 +66,7 @@ function applyAquaman(aquamanMiddleware: Function, ...middlewares: Middleware[])
 
     const middlewareAPI: MiddlewareAPI = {
       getState: store.getState,
-      dispatch: (action, ...args) => dispatch(action, ...args)
+      dispatch: (action, ...args) => dispatch(action, ...args),
     };
     const chain = middlewares.map((middleware: any) =>
       middleware(middlewareAPI)
@@ -71,23 +74,31 @@ function applyAquaman(aquamanMiddleware: Function, ...middlewares: Middleware[])
     chain.push(
       aquamanMiddleware({
         ...middlewareAPI,
-        subscribe: store.subscribe
+        subscribe: store.subscribe,
       })
     );
     dispatch = compose<typeof dispatch>(...chain)(store.dispatch);
 
     return {
       ...store,
-      dispatch
+      dispatch,
     };
   };
 }
 
+/**
+ * Use this to compose Aquaman middleware with the rest of your
+ * Redux middleware.
+ *
+ * @param flows array of flow objects
+ * @param mapReduxToConfig configuration object
+ * @returns Redux middleware
+ */
 export function applyAquamanAndMiddleware(
   flows: FlowObj[],
   mapReduxToConfig: MapReduxToConfig
 ): any {
-  return function(...middlewares: Middleware[]) {
+  return function (...middlewares: Middleware[]) {
     return applyAquaman(
       AquamanMiddleware(flows, mapReduxToConfig),
       ...middlewares

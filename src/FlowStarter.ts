@@ -13,6 +13,7 @@ import flowController, {
 } from "./DispatchController";
 
 import { FlowObj, MapReduxToConfig, AquamanConfig } from "./Types";
+import { Excluder, FlowExcluder } from "./FlowExcluder";
 
 const defaultReduxConfig = {
   onEndFlow: async () => {},
@@ -20,6 +21,7 @@ const defaultReduxConfig = {
   shouldStartFlow: () => true,
   onWillChooseFlow: () => {},
   functionMap: {},
+  coexclusiveFlows: [],
 };
 
 function toObserable(store: Store) {
@@ -49,6 +51,8 @@ export class FlowStarter {
       ...mapReduxToConfig(store, dispatch),
     };
 
+    this.excluder = FlowExcluder(this.config.coexclusiveFlows ?? []);
+
     this.initializeFlow();
   }
 
@@ -58,6 +62,7 @@ export class FlowStarter {
   config: AquamanConfig;
   currentFlow: ControlledFlow | null = null;
   inProgress = false;
+  excluder: Excluder;
 
   initializeFlow = () => {
     const storeObservable = toObserable(this.store);
@@ -79,7 +84,14 @@ export class FlowStarter {
       }
 
       combineLatest([storeObservable, ...observables])
-        .pipe(filter(() => !this.inProgress && !!this.config.shouldStartFlow()))
+        .pipe(
+          filter(
+            () =>
+              !this.inProgress &&
+              !!this.config.shouldStartFlow() &&
+              !this.excluder.isExcluded(flow.flowId)
+          )
+        )
         .subscribe((states) => {
           const canStartFlow = flow.condition && flow.condition(...states);
 
@@ -152,6 +164,7 @@ export class FlowStarter {
     const { currentFlow } = this;
     if (currentFlow) {
       const flowId = currentFlow.getFlowId();
+      this.excluder.setViewed(flowId);
       await this.config.onEndFlow(flowId);
       this.inProgress = false;
       this.currentFlow = null;

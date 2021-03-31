@@ -23,6 +23,7 @@ export interface AquamanConfig {
   shouldStartFlow: () => boolean | void;
   onWillChooseFlow: (flow: FlowObj) => FlowObj | false | void;
   functionMap: { [functionName: string]: Function };
+  mutuallyExclusiveFlows?: string[][];
 }
 
 export type AquamanConfigPartial = Partial<AquamanConfig>;

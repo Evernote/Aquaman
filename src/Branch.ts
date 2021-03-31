@@ -1,6 +1,6 @@
-import { Branch, ActionSeries } from './Types';
+import { Branch, ActionSeries } from "./Types";
 
-/*
+/**
  * Use branch to generate conditional flows based off user actions.
  * Pass actionSeries arrays into branch. You can pass the index
  * of an actionSeries into `flow.next` to trigger that flow.
@@ -9,12 +9,14 @@ import { Branch, ActionSeries } from './Types';
  * would start calling `[flow2Step1, flow2Step2]` since it is at
  * index 1 for branch's args.
  */
-
 export function branch(...args: ActionSeries[]): Branch {
-  const branches = args.reduce((acc: { [key: number]: any }, curr: any, idx: number) => {
-    acc[idx] = curr;
-    return acc;
-  }, {});
+  const branches = args.reduce(
+    (acc: { [key: number]: any }, curr: any, idx: number) => {
+      acc[idx] = curr;
+      return acc;
+    },
+    {}
+  );
 
   return {
     __BRANCH__: true,

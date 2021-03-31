@@ -19,8 +19,9 @@ module.exports = {
   output: {
     filename: "index.js",
     path: path.resolve(__dirname, "dist"),
-    library: "aquaman-redux",
-    libraryTarget: "commonjs2",
+    library: {
+      type: "commonjs2",
+    },
   },
   externals: {
     rxjs: "rxjs",

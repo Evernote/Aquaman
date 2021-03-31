@@ -13,6 +13,7 @@ export {
   MapReduxToConfig,
   AquamanStep,
   MappedFunction,
+  ActionSeries,
 } from "./Types";
 import { AquamanStep } from "./Types";
 

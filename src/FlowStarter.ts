@@ -88,7 +88,7 @@ export class FlowStarter {
           filter(
             () =>
               !this.inProgress &&
-              !!this.config.shouldStartFlow() &&
+              !!this.config.shouldStartFlow(flow.flowId) &&
               !this.excluder.isExcluded(flow.flowId)
           )
         )

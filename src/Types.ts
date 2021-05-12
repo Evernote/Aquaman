@@ -20,7 +20,7 @@ export interface AquamanConfig {
   persistSettings?: PersistSettings;
   onEndFlow: (flowId: string) => Promise<void>;
   onStep: () => void;
-  shouldStartFlow: () => boolean | void;
+  shouldStartFlow: (flowId: string) => boolean | void;
   onWillChooseFlow: (flow: FlowObj) => FlowObj | false | void;
   functionMap: { [functionName: string]: Function };
   mutuallyExclusiveFlows?: string[][];

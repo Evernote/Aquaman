@@ -19,7 +19,7 @@ export interface PersistSettings {
 export interface AquamanConfig {
   persistSettings?: PersistSettings;
   onEndFlow: (flowId: string) => Promise<void>;
-  onStep: () => void;
+  onStep: (flowId: string, stepCount: number) => void;
   shouldStartFlow: (flowId: string) => boolean | void;
   onWillChooseFlow: (flow: FlowObj) => FlowObj | false | void;
   functionMap: { [functionName: string]: Function };

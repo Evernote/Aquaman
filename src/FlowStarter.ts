@@ -62,6 +62,7 @@ export class FlowStarter {
   config: AquamanConfig;
   currentFlow: ControlledFlow | null = null;
   inProgress = false;
+  stepCount = 0;
   excluder: Excluder;
 
   initializeFlow = () => {
@@ -135,27 +136,32 @@ export class FlowStarter {
     );
     if (this.currentFlow) {
       this.inProgress = true;
+      this.stepCount = 0;
       this.next();
     }
   };
 
   next = (data?: any) => {
     const { currentFlow } = this;
+    const flowId = currentFlow?.getFlowId() ?? ''
 
     if (currentFlow) {
-      this.config.onStep();
       const done = currentFlow.next(data);
-
       if (done) {
         this.close();
+      } else {
+        this.stepCount++;
+        this.config.onStep(flowId, this.stepCount);
       }
     }
   };
 
   previous = () => {
     const { currentFlow } = this;
+    const flowId = currentFlow?.getFlowId() ?? ''
     if (currentFlow) {
-      this.config.onStep();
+      this.stepCount--
+      this.config.onStep(flowId, this.stepCount);
       currentFlow.previous();
     }
   };
@@ -168,6 +174,7 @@ export class FlowStarter {
       await this.config.onEndFlow(flowId);
       this.inProgress = false;
       this.currentFlow = null;
+      this.stepCount = 0;
       this.config.persistSettings?.saveLocation(AQUAMAN_LOCATION_ID, "");
     }
   };

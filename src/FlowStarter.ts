@@ -146,12 +146,11 @@ export class FlowStarter {
     const flowId = currentFlow?.getFlowId() ?? ''
 
     if (currentFlow) {
+      this.stepCount++;
+      this.config.onStep(flowId, this.stepCount);
       const done = currentFlow.next(data);
       if (done) {
         this.close();
-      } else {
-        this.stepCount++;
-        this.config.onStep(flowId, this.stepCount);
       }
     }
   };

@@ -15,9 +15,7 @@ function AquamanMiddleware(
   flows: FlowObj[],
   mapReduxToConfig: MapReduxToConfig
 ): any {
-  return (store: MiddlewareAPI<Dispatch<any>, any>) => (
-    next: Dispatch<any>
-  ) => {
+  return (store: MiddlewareAPI<Dispatch<any>, any>) => (next: Dispatch<any>) => {
     const flow = new FlowStarter(
       flows,
       mapReduxToConfig,
@@ -25,8 +23,8 @@ function AquamanMiddleware(
       store.dispatch
     );
 
-    return (action: any) => {
-      switch (action.type) {
+    return (action?: { [key: string]: any; type: string; data: any }) => {
+      switch (action?.type) {
         case AquamanStep.NEXT:
           flow.next(action.data);
           break;
@@ -52,38 +50,36 @@ function applyAquaman(
   aquamanMiddleware: Function,
   ...middlewares: Middleware[]
 ) {
-  return (createStore: StoreCreator) => <S, A extends AnyAction>(
-    reducer: Reducer<S, A>,
-    ...args: any[]
-  ) => {
-    const store = createStore(reducer, ...args);
-    let dispatch: Dispatch = () => {
-      throw new Error(
-        "Dispatching while constructing your middleware is not allowed. " +
-          "Other middleware would not be applied to this dispatch."
+  return (createStore: StoreCreator) =>
+    <S, A extends AnyAction>(reducer: Reducer<S, A>, ...args: any[]) => {
+      const store = createStore(reducer, ...args);
+      let dispatch: Dispatch = () => {
+        throw new Error(
+          "Dispatching while constructing your middleware is not allowed. " +
+            "Other middleware would not be applied to this dispatch."
+        );
+      };
+
+      const middlewareAPI: MiddlewareAPI = {
+        getState: store.getState,
+        dispatch: (action, ...args) => dispatch(action, ...args),
+      };
+      const chain = middlewares.map((middleware: any) =>
+        middleware(middlewareAPI)
       );
-    };
+      chain.push(
+        aquamanMiddleware({
+          ...middlewareAPI,
+          subscribe: store.subscribe,
+        })
+      );
+      dispatch = compose<typeof dispatch>(...chain)(store.dispatch);
 
-    const middlewareAPI: MiddlewareAPI = {
-      getState: store.getState,
-      dispatch: (action, ...args) => dispatch(action, ...args),
+      return {
+        ...store,
+        dispatch,
+      };
     };
-    const chain = middlewares.map((middleware: any) =>
-      middleware(middlewareAPI)
-    );
-    chain.push(
-      aquamanMiddleware({
-        ...middlewareAPI,
-        subscribe: store.subscribe,
-      })
-    );
-    dispatch = compose<typeof dispatch>(...chain)(store.dispatch);
-
-    return {
-      ...store,
-      dispatch,
-    };
-  };
 }
 
 /**

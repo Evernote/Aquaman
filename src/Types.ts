@@ -16,12 +16,17 @@ export interface PersistSettings {
   recoverLocation(key: string): Promise<void>;
 }
 
+export interface OnWillChooseFlowReturn {
+  overridingFlow?: FlowObj,
+  preventFlowStart?: boolean,
+}
+
 export interface AquamanConfig {
   persistSettings?: PersistSettings;
   onEndFlow: (flowId: string) => Promise<void>;
   onStep: (flowId: string, stepCount: number) => void;
   shouldStartFlow: (flowId: string) => boolean | void;
-  onWillChooseFlow: (flow: FlowObj) => FlowObj | false | void;
+  onWillChooseFlow: (flow: FlowObj) => OnWillChooseFlowReturn | FlowObj | false | void;
   functionMap: { [functionName: string]: Function };
   mutuallyExclusiveFlows?: string[][];
 }

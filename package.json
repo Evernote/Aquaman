@@ -1,6 +1,6 @@
 {
   "name": "aquaman-redux",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Redux middlewear for composable, declarative control flow",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

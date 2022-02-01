@@ -12,7 +12,7 @@ import flowController, {
   AQUAMAN_LOCATION_ID,
 } from "./DispatchController";
 
-import { FlowObj, MapReduxToConfig, AquamanConfig } from "./Types";
+import { FlowObj, MapReduxToConfig, AquamanConfig, OnWillChooseFlowReturn } from "./Types";
 import { Excluder, FlowExcluder } from "./FlowExcluder";
 
 const defaultReduxConfig = {
@@ -97,10 +97,28 @@ export class FlowStarter {
           const canStartFlow = flow.condition && flow.condition(...states);
 
           if (canStartFlow) {
-            const overrridingFlow = this.config.onWillChooseFlow(flow);
+            const returnDataOrFlowObj = this.config.onWillChooseFlow(flow);
+
+            const onWillChooseFlowReturn = ((): OnWillChooseFlowReturn => {
+              if (typeof returnDataOrFlowObj == 'object' && returnDataOrFlowObj != null) {
+                if ((returnDataOrFlowObj as FlowObj).flowId != null) {
+                  return {
+                      overridingFlow: returnDataOrFlowObj as FlowObj
+                    };
+                } else {
+                  return returnDataOrFlowObj as OnWillChooseFlowReturn
+                }
+              } else {
+                return {}
+              }
+            })();
+
+            if (onWillChooseFlowReturn.preventFlowStart) {
+              return;
+            }
 
             this.currentFlow = flowController(
-              overrridingFlow || flow,
+              onWillChooseFlowReturn?.overridingFlow || flow,
               this.config.functionMap,
               this.dispatch,
               this.config.persistSettings

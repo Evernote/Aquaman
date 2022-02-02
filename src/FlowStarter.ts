@@ -141,9 +141,27 @@ export class FlowStarter {
       return;
     }
 
-    const selectedFlow = this.config.onWillChooseFlow(forcedFlow) || forcedFlow;
+    const returnDataOrFlowObj = this.config.onWillChooseFlow(forcedFlow);
 
-    this.setFlow(selectedFlow);
+    const onWillChooseFlowReturn = ((): OnWillChooseFlowReturn => {
+      if (typeof returnDataOrFlowObj == 'object' && returnDataOrFlowObj != null) {
+        if ((returnDataOrFlowObj as FlowObj).flowId != null) {
+          return {
+              overridingFlow: returnDataOrFlowObj as FlowObj
+            };
+        } else {
+          return returnDataOrFlowObj as OnWillChooseFlowReturn
+        }
+      } else {
+        return {}
+      }
+    })();
+
+    if (onWillChooseFlowReturn.preventFlowStart) {
+      return; 
+    }
+
+    this.setFlow(onWillChooseFlowReturn.overridingFlow || forcedFlow);
   };
 
   setFlow = (selectedFlow: FlowObj) => {

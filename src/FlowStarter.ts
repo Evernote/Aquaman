@@ -12,7 +12,7 @@ import flowController, {
   AQUAMAN_LOCATION_ID,
 } from "./DispatchController";
 
-import { FlowObj, MapReduxToConfig, AquamanConfig, OnWillChooseFlowReturn } from "./Types";
+import { FlowObj, MapReduxToConfig, AquamanConfig, OnWillChooseFlowReturn, FlowTriggerType } from "./Types";
 import { Excluder, FlowExcluder } from "./FlowExcluder";
 
 const defaultReduxConfig = {
@@ -97,7 +97,10 @@ export class FlowStarter {
           const canStartFlow = flow.condition && flow.condition(...states);
 
           if (canStartFlow) {
-            const returnDataOrFlowObj = this.config.onWillChooseFlow(flow);
+            const flowOptions = {
+              triggerType: FlowTriggerType.Conditions
+            };
+            const returnDataOrFlowObj = this.config.onWillChooseFlow(flow, flowOptions);
 
             const onWillChooseFlowReturn = ((): OnWillChooseFlowReturn => {
               if (typeof returnDataOrFlowObj == 'object' && returnDataOrFlowObj != null) {
@@ -141,7 +144,10 @@ export class FlowStarter {
       return;
     }
 
-    const returnDataOrFlowObj = this.config.onWillChooseFlow(forcedFlow);
+    const flowOptions = {
+      triggerType: FlowTriggerType.ForceFlow
+    };
+    const returnDataOrFlowObj = this.config.onWillChooseFlow(forcedFlow, flowOptions);
 
     const onWillChooseFlowReturn = ((): OnWillChooseFlowReturn => {
       if (typeof returnDataOrFlowObj == 'object' && returnDataOrFlowObj != null) {

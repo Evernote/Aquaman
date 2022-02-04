@@ -21,12 +21,24 @@ export interface OnWillChooseFlowReturn {
   preventFlowStart?: boolean,
 }
 
+export enum FlowTriggerType {
+  Conditions = 'Conditions',
+  ForceFlow = 'ForceFlow',
+}
+
+export interface FlowOptions {
+  triggerType: FlowTriggerType;
+}
+
+type OnWillChooseFlow = (flow: FlowObj) => OnWillChooseFlowReturn | FlowObj | false | void;
+type OnWillChooseFlowWithOptions = (flow: FlowObj, flowOptions: FlowOptions) => OnWillChooseFlowReturn | FlowObj | false | void;
+
 export interface AquamanConfig {
   persistSettings?: PersistSettings;
   onEndFlow: (flowId: string) => Promise<void>;
   onStep: (flowId: string, stepCount: number) => void;
   shouldStartFlow: (flowId: string) => boolean | void;
-  onWillChooseFlow: (flow: FlowObj) => OnWillChooseFlowReturn | FlowObj | false | void;
+  onWillChooseFlow: OnWillChooseFlow | OnWillChooseFlowWithOptions;
   functionMap: { [functionName: string]: Function };
   mutuallyExclusiveFlows?: string[][];
 }

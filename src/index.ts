@@ -14,6 +14,9 @@ export {
   AquamanStep,
   MappedFunction,
   ActionSeries,
+  OnWillChooseFlowReturn,
+  FlowTriggerType,
+  FlowOptions,
 } from "./Types";
 import { AquamanStep } from "./Types";
 

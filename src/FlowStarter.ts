@@ -12,11 +12,18 @@ import flowController, {
   AQUAMAN_LOCATION_ID,
 } from "./DispatchController";
 
-import { FlowObj, MapReduxToConfig, AquamanConfig, OnWillChooseFlowReturn, FlowTriggerType } from "./Types";
+import {
+  FlowObj,
+  MapReduxToConfig,
+  AquamanConfig,
+  OnWillChooseFlowReturn,
+  FlowTriggerType,
+} from "./Types";
 import { Excluder, FlowExcluder } from "./FlowExcluder";
 
 const defaultReduxConfig = {
   onEndFlow: async () => {},
+  onCompleteFlow: () => {},
   onStep: () => {},
   shouldStartFlow: () => true,
   onWillChooseFlow: () => {},
@@ -98,21 +105,27 @@ export class FlowStarter {
 
           if (canStartFlow) {
             const flowOptions = {
-              triggerType: FlowTriggerType.Conditions
+              triggerType: FlowTriggerType.Conditions,
             };
-            const returnDataOrFlowObj = this.config.onWillChooseFlow(flow, flowOptions);
+            const returnDataOrFlowObj = this.config.onWillChooseFlow(
+              flow,
+              flowOptions
+            );
 
             const onWillChooseFlowReturn = ((): OnWillChooseFlowReturn => {
-              if (typeof returnDataOrFlowObj == 'object' && returnDataOrFlowObj != null) {
+              if (
+                typeof returnDataOrFlowObj == "object" &&
+                returnDataOrFlowObj != null
+              ) {
                 if ((returnDataOrFlowObj as FlowObj).flowId != null) {
                   return {
-                      overridingFlow: returnDataOrFlowObj as FlowObj
-                    };
+                    overridingFlow: returnDataOrFlowObj as FlowObj,
+                  };
                 } else {
-                  return returnDataOrFlowObj as OnWillChooseFlowReturn
+                  return returnDataOrFlowObj as OnWillChooseFlowReturn;
                 }
               } else {
-                return {}
+                return {};
               }
             })();
 
@@ -145,26 +158,32 @@ export class FlowStarter {
     }
 
     const flowOptions = {
-      triggerType: FlowTriggerType.ForceFlow
+      triggerType: FlowTriggerType.ForceFlow,
     };
-    const returnDataOrFlowObj = this.config.onWillChooseFlow(forcedFlow, flowOptions);
+    const returnDataOrFlowObj = this.config.onWillChooseFlow(
+      forcedFlow,
+      flowOptions
+    );
 
     const onWillChooseFlowReturn = ((): OnWillChooseFlowReturn => {
-      if (typeof returnDataOrFlowObj == 'object' && returnDataOrFlowObj != null) {
+      if (
+        typeof returnDataOrFlowObj == "object" &&
+        returnDataOrFlowObj != null
+      ) {
         if ((returnDataOrFlowObj as FlowObj).flowId != null) {
           return {
-              overridingFlow: returnDataOrFlowObj as FlowObj
-            };
+            overridingFlow: returnDataOrFlowObj as FlowObj,
+          };
         } else {
-          return returnDataOrFlowObj as OnWillChooseFlowReturn
+          return returnDataOrFlowObj as OnWillChooseFlowReturn;
         }
       } else {
-        return {}
+        return {};
       }
     })();
 
     if (onWillChooseFlowReturn.preventFlowStart) {
-      return; 
+      return;
     }
 
     this.setFlow(onWillChooseFlowReturn.overridingFlow || forcedFlow);
@@ -185,13 +204,14 @@ export class FlowStarter {
 
   next = (data?: any) => {
     const { currentFlow } = this;
-    const flowId = currentFlow?.getFlowId() ?? ''
+    const flowId = currentFlow?.getFlowId() ?? "";
 
     if (currentFlow) {
       this.stepCount++;
       this.config.onStep(flowId, this.stepCount);
       const done = currentFlow.next(data);
       if (done) {
+        this.config.onCompleteFlow(flowId);
         this.close();
       }
     }
@@ -199,9 +219,9 @@ export class FlowStarter {
 
   previous = () => {
     const { currentFlow } = this;
-    const flowId = currentFlow?.getFlowId() ?? ''
+    const flowId = currentFlow?.getFlowId() ?? "";
     if (currentFlow) {
-      this.stepCount--
+      this.stepCount--;
       this.config.onStep(flowId, this.stepCount);
       currentFlow.previous();
     }

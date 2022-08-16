@@ -17,25 +17,31 @@ export interface PersistSettings {
 }
 
 export interface OnWillChooseFlowReturn {
-  overridingFlow?: FlowObj,
-  preventFlowStart?: boolean,
+  overridingFlow?: FlowObj;
+  preventFlowStart?: boolean;
 }
 
 export enum FlowTriggerType {
-  Conditions = 'Conditions',
-  ForceFlow = 'ForceFlow',
+  Conditions = "Conditions",
+  ForceFlow = "ForceFlow",
 }
 
 export interface FlowOptions {
   triggerType: FlowTriggerType;
 }
 
-type OnWillChooseFlow = (flow: FlowObj) => OnWillChooseFlowReturn | FlowObj | false | void;
-type OnWillChooseFlowWithOptions = (flow: FlowObj, flowOptions: FlowOptions) => OnWillChooseFlowReturn | FlowObj | false | void;
+type OnWillChooseFlow = (
+  flow: FlowObj
+) => OnWillChooseFlowReturn | FlowObj | false | void;
+type OnWillChooseFlowWithOptions = (
+  flow: FlowObj,
+  flowOptions: FlowOptions
+) => OnWillChooseFlowReturn | FlowObj | false | void;
 
 export interface AquamanConfig {
   persistSettings?: PersistSettings;
   onEndFlow: (flowId: string) => Promise<void>;
+  onCompleteFlow: (flowId: string) => void;
   onStep: (flowId: string, stepCount: number) => void;
   shouldStartFlow: (flowId: string) => boolean | void;
   onWillChooseFlow: OnWillChooseFlow | OnWillChooseFlowWithOptions;

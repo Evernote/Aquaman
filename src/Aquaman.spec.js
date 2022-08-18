@@ -236,7 +236,7 @@ describe("Aquaman", () => {
   });
 
   describe.skip("#next", () => {
-    it("will end the flow when called on last step of series", () => {
+    it("will end the flow with isCompleted=true when called on last step of series", () => {
       const flows = [
         {
           flowId: "default",
@@ -252,7 +252,7 @@ describe("Aquaman", () => {
       expect(onStep).toHaveBeenCalledTimes(2);
       expect(aquaman.inProgress).toBeFalsy;
       expect(onEndFlow).toHaveBeenCalledTimes(1);
-      expect(onEndFlow).toBeCalledWith("default");
+      expect(onEndFlow).toBeCalledWith("default", true);
     });
 
     it("can handle branching", () => {
@@ -470,6 +470,7 @@ describe("Aquaman", () => {
       aquaman.next();
 
       expect(onEndFlow).toHaveBeenCalledTimes(1);
+      expect(onEndFlow).toHaveBeenCalledWith("close");
       expect(dispatch).toHaveBeenCalledWith({ type: "step2" });
       expect(dispatch).not.toHaveBeenCalledWith({ type: "step3" });
     });

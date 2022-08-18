@@ -35,7 +35,7 @@ type OnWillChooseFlowWithOptions = (flow: FlowObj, flowOptions: FlowOptions) => 
 
 export interface AquamanConfig {
   persistSettings?: PersistSettings;
-  onEndFlow: (flowId: string) => Promise<void>;
+  onEndFlow: (flowId: string, isCompleted?: boolean) => Promise<void>;
   onStep: (flowId: string, stepCount: number) => void;
   shouldStartFlow: (flowId: string) => boolean | void;
   onWillChooseFlow: OnWillChooseFlow | OnWillChooseFlowWithOptions;

@@ -192,7 +192,7 @@ export class FlowStarter {
       this.config.onStep(flowId, this.stepCount);
       const done = currentFlow.next(data);
       if (done) {
-        this.close();
+        this.close(true);
       }
     }
   };
@@ -207,12 +207,12 @@ export class FlowStarter {
     }
   };
 
-  close = async () => {
+  close = async (isCompleted?: boolean) => {
     const { currentFlow } = this;
     if (currentFlow) {
       const flowId = currentFlow.getFlowId();
       this.excluder.setViewed(flowId);
-      await this.config.onEndFlow(flowId);
+      await this.config.onEndFlow(flowId, isCompleted);
       this.inProgress = false;
       this.currentFlow = null;
       this.stepCount = 0;
